@@ -2,7 +2,9 @@ package com.maksimkaxxl.userregistrationeventdriven.service.impl;
 
 import com.maksimkaxxl.userregistrationeventdriven.dto.UserDto;
 import com.maksimkaxxl.userregistrationeventdriven.entity.User;
+import com.maksimkaxxl.userregistrationeventdriven.event.UserCreatedEvent;
 import com.maksimkaxxl.userregistrationeventdriven.mapper.UserMapper;
+import com.maksimkaxxl.userregistrationeventdriven.messaging.UserEventPublisher;
 import com.maksimkaxxl.userregistrationeventdriven.repository.UserRepository;
 import com.maksimkaxxl.userregistrationeventdriven.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
+    private final UserEventPublisher publisher;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
@@ -33,6 +36,13 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.toEntity(userDto);
         User savedUser = userRepository.save(user);
 
+        UserCreatedEvent event = new UserCreatedEvent(
+                savedUser.getFirstName(),
+                savedUser.getLastName(),
+                savedUser.getEmail(),
+                savedUser.getPhone()
+        );
+        publisher.send(event);
         return userMapper.toDto(savedUser);
     }
 

@@ -14,3 +14,12 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+
+  rabbitmq:
+    port: '5672'
+    host: localhost
+    username: guest
+    password: guest
+
+server:
+  port: 8080
