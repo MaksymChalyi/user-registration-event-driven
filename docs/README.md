@@ -56,13 +56,14 @@ Flow:
 
 ## Project Structure
 
-user-registration-event-driven
+```
+user-registration-event-driven/
 │
-├── user-service
-├── notification-service
+├── user-service/
+├── notification-service/
 ├── docker-compose.yml
 └── pom.xml
-
+```
 ---
 
 ## Running the Project
@@ -102,11 +103,11 @@ RabbitMQ credentials:
 ### Step 4. Test user creation
 
 Open Swagger:
-
+```
 http://localhost:8080/swagger-ui/index.html
-
+```
 Example request:
-
+```
 {
 "firstName": "John",
 "lastName": "Doe",
@@ -114,13 +115,13 @@ Example request:
 "email": "john.doe@example.com",
 "phone": "+1234567890"
 }
-
+```
 ---
 
 ## Stopping the Project
-
+```
 docker-compose down -v
-
+```
 ---
 
 ## Notes
