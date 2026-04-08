@@ -10,12 +10,14 @@ import com.maksimkaxxl.userregistrationeventdriven.messaging.UserEventPublisher;
 import com.maksimkaxxl.userregistrationeventdriven.repository.UserRepository;
 import com.maksimkaxxl.userregistrationeventdriven.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -28,18 +30,21 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto createUser(UserDto userDto) {
+        log.info("Creating user with email: {}", userDto.email());
         if (userRepository.existsByEmail(userDto.email())) {
+            log.warn("Email already exists: {}", userDto.email());
             throw new EmailAlreadyExistsException(userDto.email());
         }
 
         if (userRepository.existsByPhone(userDto.phone())) {
+            log.warn("Phone already exists: {}", userDto.phone());
             throw new PhoneAlreadyExistsException(userDto.phone());
         }
 
         User user = userMapper.toEntity(userDto);
         try {
             User savedUser = userRepository.save(user);
-
+            log.info("User saved with id: {}", savedUser.getId());
             UserCreatedEvent event = new UserCreatedEvent(
                     savedUser.getId(),
                     savedUser.getFirstName(),
@@ -50,10 +55,11 @@ public class UserServiceImpl implements UserService {
             );
 
             publisher.send(event);
-
+            log.info("UserCreatedEvent sent for userId: {}", savedUser.getId());
             return userMapper.toDto(savedUser);
 
         } catch (DataIntegrityViolationException e) {
+            log.error("DB constraint violation for email: {}, phone: {}", userDto.email(), userDto.phone(), e);
             String message = e.getMostSpecificCause().getMessage();
             if (message != null && message.contains("email")) {
                 throw new EmailAlreadyExistsException(userDto.email());
@@ -67,15 +73,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<UserDto> getAllUsers(Pageable pageable) {
+        log.info("Fetching users page: {}", pageable);
         return userRepository.findAll(pageable)
                 .map(userMapper::toDto);
     }
 
     @Override
     public UserDto getUserByEmail(String email) {
+        log.info("Fetching user by email: {}", email);
+
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> {
+                    log.warn("User not found: {}", email);
+                    return new IllegalArgumentException("User not found");
+                });
 
         return userMapper.toDto(user);
     }
+
 }
