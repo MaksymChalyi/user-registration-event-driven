@@ -16,7 +16,7 @@ spring:
     locations: classpath:db/migration
 
   rabbitmq:
-    host: localhost
+    host: ${SPRING_RABBITMQ_HOST}
     port: 5672
     username: guest
     password: guest

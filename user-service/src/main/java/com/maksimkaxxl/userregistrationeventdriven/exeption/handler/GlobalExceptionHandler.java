@@ -2,6 +2,7 @@ package com.maksimkaxxl.userregistrationeventdriven.exeption.handler;
 
 import com.maksimkaxxl.userregistrationeventdriven.exeption.EmailAlreadyExistsException;
 import com.maksimkaxxl.userregistrationeventdriven.exeption.PhoneAlreadyExistsException;
+import com.maksimkaxxl.userregistrationeventdriven.exeption.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,6 +18,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PhoneAlreadyExistsException.class)
     public ResponseEntity<String> handlePhone(PhoneAlreadyExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<String> handlePhone(UserNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 

@@ -5,6 +5,7 @@ import com.maksimkaxxl.userregistrationeventdriven.entity.User;
 import com.maksimkaxxl.userregistrationeventdriven.event.UserCreatedEvent;
 import com.maksimkaxxl.userregistrationeventdriven.exeption.EmailAlreadyExistsException;
 import com.maksimkaxxl.userregistrationeventdriven.exeption.PhoneAlreadyExistsException;
+import com.maksimkaxxl.userregistrationeventdriven.exeption.UserNotFoundException;
 import com.maksimkaxxl.userregistrationeventdriven.mapper.UserMapper;
 import com.maksimkaxxl.userregistrationeventdriven.messaging.UserEventPublisher;
 import com.maksimkaxxl.userregistrationeventdriven.repository.UserRepository;
@@ -85,7 +86,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> {
                     log.warn("User not found: {}", email);
-                    return new IllegalArgumentException("User not found");
+                    return new UserNotFoundException(email);
                 });
 
         return userMapper.toDto(user);
