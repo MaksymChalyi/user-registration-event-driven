@@ -37,10 +37,12 @@ public class UserServiceImpl implements UserService {
         User savedUser = userRepository.save(user);
 
         UserCreatedEvent event = new UserCreatedEvent(
+                savedUser.getId(),
                 savedUser.getFirstName(),
                 savedUser.getLastName(),
                 savedUser.getEmail(),
-                savedUser.getPhone()
+                savedUser.getPhone(),
+                savedUser.getCreatedAt()
         );
         publisher.send(event);
         return userMapper.toDto(savedUser);
