@@ -11,18 +11,15 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendWelcomeEmail(UserCreatedEvent event) {
-
-        log.info("Sending email to: {}", event.email());
-
-        String message = """
-                Hello %s %s,
-
-                Your account has been successfully created.
-
-                Regards,
-                System
-                """.formatted(event.firstName(), event.lastName());
-
-        log.info("EMAIL CONTENT:\n{}", message);
+        log.info("""
+                        === EMAIL ===
+                        To: {}
+                        Subject: Welcome
+                        Body: Hello {} {}
+                        """,
+                event.email(),
+                event.firstName(),
+                event.lastName()
+        );
     }
 }
